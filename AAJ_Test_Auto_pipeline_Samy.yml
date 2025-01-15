@@ -7,7 +7,7 @@ trigger:
 - master
 
 pool:
-  vmImage: Windows2022
+  vmImage: Ubuntu 20.04
 
 steps:
 - task: Maven@4
