@@ -4,19 +4,50 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/java
 
 trigger:
-- master
+- main
 
 pool:
-  vmImage: ubuntu-latest
+  vmImage: 'windows-latest'
+
+variables:
+  mavenVersion: '3.9.8'
+  javaVersion: '21'
 
 steps:
+# Step 1: Install JDK
+- task: UseJavaVersion@1
+  inputs:
+    versionSpec: '$(javaVersion)'
+    jdkArchitecture: 'x64'
+
+# Step 2: Install Maven
 - task: Maven@3
   inputs:
+    mavenVersionOption: 'Default' # Use default Maven or custom version
+    mavenVersion: '$(mavenVersion)'
+    mavenSetM2Home: true
+
+
+
+# Step 4: Run Selenium Tests
+- task: Maven@3
+  displayName: 'Run Selenium Tests'
+  inputs:
     mavenPomFile: 'pom.xml'
-    mavenOptions: '-Xmx3072m'
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.11'
-    jdkArchitectureOption: 'x64'
-    publishJUnitResults: true
-    testResultsFiles: '**/surefire-reports/TEST-*.xml'
-    goals: 'package'
+    goals: 'clean test'
+
+# Step 5: Generate Test Reports
+- task: PublishTestResults@2
+  displayName: 'Publish Test Results'
+  inputs:
+    testResultsFormat: 'JUnit'
+    testResultsFiles: '**/target/surefire-reports/*.xml'
+    failTaskOnFailedTests: true
+
+# Step 6: Publish HTML Reports (if using an HTML report plugin like ExtentReports)
+- task: PublishPipelineArtifact@1
+  displayName: 'Publish HTML Report'
+  inputs:
+    targetPath: 'target/report-folder'
+    artifactName: 'TestReports'
+    publishLocation: 'pipeline'
