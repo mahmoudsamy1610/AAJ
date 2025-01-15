@@ -7,7 +7,7 @@ trigger:
 - master
 
 pool:
-  vmImage: Windows Server 2022
+  vmImage: Windows2022
 
 steps:
 - task: Maven@4
