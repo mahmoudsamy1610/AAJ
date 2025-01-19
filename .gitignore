@@ -4,6 +4,4 @@ target/
 .idea/
 
 ### reports ####
-allure-results/
-allure-reports/
-execution-summary/
+
